@@ -51,6 +51,24 @@ vector<vector<float>> H = {
     {29.8, 21.8, 16.6, 15.4, 17.9, 18.2, 15.6, 0, 26.6, 21.2, 0, 0, 0, 0},
 };
 
+class Node
+{
+public:
+    Node(int idx, double value, double cost, Node *parent, bool visited)
+    {
+        this->idx = idx;
+        this->value = value;
+        this->cost = cost;
+        this->parent = parent;
+        this->visited = visited;
+    }
+
+    int idx;
+    double value, cost;
+    Node *parent;
+    bool visited;
+};
+
 void Astar(vector<vector<Pair>> adj, int S, int T)
 {
     int V = adj.size();
@@ -90,12 +108,12 @@ void Astar(vector<vector<Pair>> adj, int S, int T)
                 nodeCost = node.first;
                 nodeIdx = node.second;
 
-                newCost = currCost + nodeCost; /////
+                newCost = currCost + nodeCost;
                 newValue = newCost + H[nodeIdx][T]; // f = g + h
 
                 if ((value[nodeIdx] > newValue))
                 {
-                    cost[node.second] = newCost; ////
+                    cost[node.second] = newCost;
                     value[nodeIdx] = newValue;
                     frontier.push({value[nodeIdx], nodeIdx});
                     parent[nodeIdx] = currNode;
@@ -118,7 +136,7 @@ void Astar(vector<vector<Pair>> adj, int S, int T)
 
 int main()
 {
-    // pair {weight, nodeIndex}
+    // pair {custo, nodeIndex}
     vector<vector<Pair>> adj = {{{10, 1}},
                                 {{10, 0}, {8.5, 2}, {10, 8}, {3.5, 9}},
                                 {{8.5, 1}, {6.3, 3}, {9.4, 8}, {18.7, 12}},
