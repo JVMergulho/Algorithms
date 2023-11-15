@@ -3,12 +3,6 @@ using namespace std;
 
 typedef pair<double, int> Pair;
 
-void print_vector(vector<int> V)
-{
-    for (int i : V)
-        cout << i << " ";
-}
-
 void print_path(vector<int> parent, int target)
 {
     int curr = target;
@@ -42,14 +36,14 @@ vector<vector<double>> H = {
     {36.4, 26.6, 18.2, 12, 0, 3, 2.4, 19.4, 23.3, 28.2, 34.2, 24.8, 14.5, 17.9},
     {38.8, 29.1, 20.6, 14.4, 3, 0, 3.3, 22.3, 25.7, 30.3, 36.7, 27.6, 15.2, 18.2},
     {35.8, 26.1, 17.6, 11.5, 2.4, 3.3, 0, 20, 23, 27.3, 34.2, 25.7, 12.4, 15.6},
-    {25.4, 17.3, 13.6, 12.4, 19.4, 22.3, 20, 8.2, 20.3, 16.1, 6.4, 22.7, 27.6, 0},
-    {17.6, 10, 9.4, 12.6, 23.3, 25.7, 23, 20.3, 8.2, 13.5, 11.2, 10.9, 21.2, 26.6},
-    {9.1, 3.5, 10.3, 16.7, 28.2, 30.3, 27.3, 16.1, 13.5, 0, 17.6, 24.2, 18.7, 21.2},
-    {16.7, 15.5, 19.5, 23.6, 34.2, 36.7, 34.2, 6.4, 11.2, 17.6, 0, 28.8, 33.6, 0},
-    {27.3, 20.9, 19.1, 18.6, 24.8, 27.6, 25.7, 22.7, 10.9, 24.2, 28.8, 0, 5.1, 0},
-    {27.6, 19.1, 12.1, 10.6, 14.5, 15.2, 12.4, 27.6, 21.2, 18.7, 33.6, 5.1, 0, 0},
-    {29.8, 21.8, 16.6, 15.4, 17.9, 18.2, 15.6, 0, 26.6, 21.2, 0, 0, 0, 0},
-};
+    {25.4, 17.3, 13.6, 12.4, 19.4, 22.3, 20, 0, 8.2, 20.3, 16.1, 6.4, 22.7, 27.6},
+    {17.6, 10, 9.4, 12.6, 23.3, 25.7, 23, 8.2, 0, 13.5, 11.2, 10.9, 21.2, 26.6},
+    {9.1, 3.5, 10.3, 16.7, 28.2, 30.3, 27.3, 20.3, 13.5, 0, 17.6, 24.2, 18.7, 21.2},
+    {16.7, 15.5, 19.5, 23.6, 34.2, 36.7, 34.2, 16.1, 11.2, 17.6, 0, 14.2, 31.5, 35.5},
+    {27.3, 20.9, 19.1, 18.6, 24.8, 27.6, 25.7, 6.4, 10.9, 24.2, 14.2, 0, 28.8, 33.6},
+    {27.6, 19.1, 12.1, 10.6, 14.5, 15.2, 12.4, 22.7, 21.2, 18.7, 31.5, 28.8, 0, 5.1},
+    {29.8, 21.8, 16.6, 15.4, 17.9, 18.2, 15.6, 27.6, 26.6, 21.2, 35.5, 33.6, 5.1, 0}
+    };
 
 class Node
 {
@@ -100,7 +94,7 @@ void Astar(vector<vector<Pair>> adj, int S, int T)
 
         if (!visited[currNode])
         {
-            cout << "CurrNode = " << currNode << "\n";
+            cout << "CurrNode = E" << currNode + 1 << "\n";
             visited[currNode] = true;
 
             for (Pair node : adj[currNode])
@@ -124,10 +118,10 @@ void Astar(vector<vector<Pair>> adj, int S, int T)
 
     if (found)
     {
-        cout << "CurrNode = " << currNode << "\n";
+        cout << "CurrNode = E" << currNode + 1 << "\n";
         cout << "Path found! \n";
-        cout << "Custo total = " << cost[T] << "\n ";
-        // print_vector(parent);
+        cout << "Distancia percorrida = " << cost[T] << " km\n";
+        cout << "Tempo do trajeto = " << cost[T] * 2.0 << " min\n "; // 30 km/h = 1/2 km/min
         print_path(parent, T);
     }
     else
@@ -150,16 +144,19 @@ int main()
                                 {{12.2, 8}},                                // 10 -> E11
                                 {{6.4, 7}},                                 // 11 -> E12
                                 {{18.7, 2}, {12.8, 3}, {5.1, 13}},          // 12 -> E13
-                                {{5.1, 12}, {11, 3}}};                      // tá estranho       // 13 -> E14
+                                {{5.1, 12}, {11, 3}}};                      // 13 -> E14
 
+    /*
+    tá estranho: tem uma aresta que n existe no mapa e E4 se liga diretamente ao E14
+    */
     int S, T;
 
     cout << "Estacao de partida: ";
     cin >> S;
-    cout << "\nEstacao de chegada: ";
+    cout << "Estacao de chegada: ";
     cin >> T;
 
-    Astar(adj, S, T);
+    Astar(adj, S - 1, T - 1);
 
     return 0;
 }
