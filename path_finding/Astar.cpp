@@ -1,4 +1,4 @@
-#include <bits/stdc++.h>
+#include <bits/stdc++.h> // Inclui STL
 using namespace std;
 
 typedef pair<double, int> Pair;
@@ -23,18 +23,18 @@ void print_path(vector<int> parent, int target)
     reverse(path.begin(), path.end());
 
     cout << "\nShortest path: ";
-    for (int i = 0; i < path.size(); i++)
+    for (unsigned int i = 0; i < path.size(); i++)
     {
         if (i != path.size() - 1)
-            cout << path[i] << " -> ";
+            cout << "E" << path[i] + 1 << " -> ";
         else
-            cout << path[i] << "\n";
+            cout << "E" << path[i] + 1 << "\n";
     }
 }
 
 // Heurística
 // H[i][j] = distância em linha reta de i a j
-vector<vector<float>> H = {
+vector<vector<double>> H = {
     {0, 10, 18.5, 24.8, 36.4, 38.8, 35.8, 25.4, 17.6, 9.1, 16.7, 27.3, 27.6, 29.8},
     {10, 0, 8.5, 14.8, 26.6, 29.1, 26.1, 17.3, 10, 3.5, 15.5, 20.9, 19.1, 21.8},
     {18.5, 8.5, 0, 6.3, 18.2, 20.6, 17.6, 13.6, 9.4, 10.3, 19.5, 19.1, 12.1, 16.6},
@@ -73,10 +73,10 @@ void Astar(vector<vector<Pair>> adj, int S, int T)
 {
     int V = adj.size();
 
-    priority_queue<Pair> frontier;
+    priority_queue<Pair, vector<Pair>, greater<Pair>> frontier;
     vector<int> parent(V, -1);
-    vector<double> cost(V, FLT_MAX);
-    vector<double> value(V, FLT_MAX);
+    vector<double> cost(V, FLT_MAX);  // g
+    vector<double> value(V, FLT_MAX); // f
     vector<bool> visited(V, false);
     int currNode, nodeIdx;
     double currCost, nodeCost, newCost, newValue;
@@ -86,10 +86,10 @@ void Astar(vector<vector<Pair>> adj, int S, int T)
     value[S] = H[S][T];
     frontier.push({0, S});
 
-    while (!frontier.empty())
+    while (!frontier.empty()) // pair {f, idx}
     {
-        currCost = cost[currNode];
         currNode = frontier.top().second;
+        currCost = cost[currNode];
         frontier.pop();
 
         if (currNode == T)
@@ -137,22 +137,29 @@ void Astar(vector<vector<Pair>> adj, int S, int T)
 int main()
 {
     // pair {custo, nodeIndex}
-    vector<vector<Pair>> adj = {{{10, 1}},
-                                {{10, 0}, {8.5, 2}, {10, 8}, {3.5, 9}},
-                                {{8.5, 1}, {6.3, 3}, {9.4, 8}, {18.7, 12}},
-                                {{13, 4}, {15.3, 7}, {12.8, 12}, {11, 13}},
-                                {{3, 5}, {2.4, 6}, {30, 7}},
-                                {{3, 4}},
-                                {{2.4, 4}},
-                                {{15.3, 3}, {30, 4}, {9.6, 8}, {6.4, 12}},
-                                {{10, 1}, {9.4, 2}, {9.6, 7}, {12.2, 10}},
-                                {{3.5, 1}},
-                                {{12.2, 8}},
-                                {{6.4, 7}},
-                                {{18.7, 2}, {12.8, 3}, {5.1, 13}},
-                                {{5.1, 12}, {11, 3}}}; // tá estranho
+    vector<vector<Pair>> adj = {{{10, 1}},                                  // 0 -> E1
+                                {{10, 0}, {8.5, 2}, {10, 8}, {3.5, 9}},     // 1 -> E2
+                                {{8.5, 1}, {6.3, 3}, {9.4, 8}, {18.7, 12}}, // 2 -> E3
+                                {{13, 4}, {15.3, 7}, {12.8, 12}, {11, 13}}, // 3 -> E4
+                                {{3, 5}, {2.4, 6}, {30, 7}},                // 4 -> E5
+                                {{3, 4}},                                   // 5 -> E6
+                                {{2.4, 4}},                                 // 6 -> E7
+                                {{15.3, 3}, {30, 4}, {9.6, 8}, {6.4, 11}},  // 7 -> E8
+                                {{10, 1}, {9.4, 2}, {9.6, 7}, {12.2, 10}},  // 8 -> E9
+                                {{3.5, 1}},                                 // 9 -> E10
+                                {{12.2, 8}},                                // 10 -> E11
+                                {{6.4, 7}},                                 // 11 -> E12
+                                {{18.7, 2}, {12.8, 3}, {5.1, 13}},          // 12 -> E13
+                                {{5.1, 12}, {11, 3}}};                      // tá estranho       // 13 -> E14
 
-    Astar(adj, 0, 4);
+    int S, T;
+
+    cout << "Estacao de partida: ";
+    cin >> S;
+    cout << "\nEstacao de chegada: ";
+    cin >> T;
+
+    Astar(adj, S, T);
 
     return 0;
 }
