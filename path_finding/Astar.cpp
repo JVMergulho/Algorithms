@@ -1,7 +1,9 @@
 #include <bits/stdc++.h> // Inclui STL
 using namespace std;
 
-typedef pair<double, int> Pair;
+typedef tuple <double, int, string> Triple;
+typedef pair<string, string> Pairss;
+typedef pair<double, Pairss> Pairdss;
 
 void print_path(vector<int> parent, int target)
 {
@@ -45,72 +47,67 @@ vector<vector<double>> H = {
     {29.8, 21.8, 16.6, 15.4, 17.9, 18.2, 15.6, 27.6, 26.6, 21.2, 35.5, 33.6, 5.1, 0}
     };
 
+double calculateH(string sta1, string sta2)
+{
+    int i = int(sta1[1]) - 1;
+    int j = int(sta2[1]) - 1;
+
+    return H[i][j];
+}
+
 class Node
 {
 public:
-    Node(int idx, double value, double cost, Node *parent, bool visited)
-    {
-        this->idx = idx;
-        this->value = value;
-        this->cost = cost;
-        this->parent = parent;
-        this->visited = visited;
-    }
-
-    int idx;
-    double value, cost;
-    Node *parent;
-    bool visited;
+    Pairss state;
+    double value = FLT_MAX, cost = FLT_MAX;
+    Node *parent = NULL;
+    bool visited = false;
 };
 
-void Astar(vector<vector<Pair>> adj, int S, int T)
+void Astar(map<Pairss, vector<pair<double, Pairss>>> adj, Pairss start, string target)
 {
     int V = adj.size();
 
-    priority_queue<Pair, vector<Pair>, greater<Pair>> frontier;
-    vector<int> parent(V, -1);
-    vector<double> cost(V, FLT_MAX);  // g
-    vector<double> value(V, FLT_MAX); // f
-    vector<bool> visited(V, false);
-    int currNode, nodeIdx;
-    double currCost, nodeCost, newCost, newValue;
+    priority_queue<Pairdss, vector<Pairdss>, greater<Pairdss>> frontier;
     bool found;
 
-    cost[S] = 0;
-    value[S] = H[S][T];
-    frontier.push({0, S});
+    map<Pairss, Node> nodes;
+    nodes[start] = Node();
+    nodes[start].value = calculateH(start.first);
 
-    while (!frontier.empty()) // pair {f, idx}
+    frontier.push({0, start});
+
+    while (!frontier.empty()) // pair {f , state}
     {
-        currNode = frontier.top().second;
-        currCost = cost[currNode];
+        CurrState = frontier.top().second; // pair { station, color}
+        currCost = nodes[CurrState].cost;
         frontier.pop();
 
-        if (currNode == T)
+        if (CurrState.first == target)
         {
             found = true;
             break;
         }
 
-        if (!visited[currNode])
+        if (!CurrState.visited)
         {
-            cout << "CurrNode = E" << currNode + 1 << "\n";
-            visited[currNode] = true;
+            cout << "CurrState = E" << CurrState << "\n";
+            nodes[CurrState].visited = true;
 
-            for (Pair node : adj[currNode])
+            for (Pairdss node : adj[CurrState])
             {
                 nodeCost = node.first;
-                nodeIdx = node.second;
+                state = node.second;
 
                 newCost = currCost + nodeCost;
-                newValue = newCost + H[nodeIdx][T]; // f = g + h
+                newValue = newCost + calculateH(state.first, target); // f = g + h
 
-                if ((value[nodeIdx] > newValue))
+                if ((nodes[state].value > newValue))
                 {
-                    cost[node.second] = newCost;
-                    value[nodeIdx] = newValue;
-                    frontier.push({value[nodeIdx], nodeIdx});
-                    parent[nodeIdx] = currNode;
+                    nodes[state].cost = newCost;
+                    nodes[state].value = newValue;
+                    frontier.push({newValue, state});
+                    nodes[state].parent = CurrState;
                 }
             }
         }
@@ -118,11 +115,11 @@ void Astar(vector<vector<Pair>> adj, int S, int T)
 
     if (found)
     {
-        cout << "CurrNode = E" << currNode + 1 << "\n";
+        // cout << "CurrNode = E" << currNode + 1 << "\n";
         cout << "Path found! \n";
-        cout << "Distancia percorrida = " << cost[T] << " km\n";
-        cout << "Tempo do trajeto = " << cost[T] * 2.0 << " min\n "; // 30 km/h = 1/2 km/min
-        print_path(parent, T);
+        // cout << "Distancia percorrida = " << cost[T] << " km\n";
+        // cout << "Tempo do trajeto = " << cost[T] * 2.0 << " min\n "; // 30 km/h = 1/2 km/min
+        // print_path(parent, T);
     }
     else
         cout << "It was not possible to find a path between " << S << " and " << T;
@@ -130,33 +127,54 @@ void Astar(vector<vector<Pair>> adj, int S, int T)
 
 int main()
 {
-    // pair {custo, nodeIndex}
-    vector<vector<Pair>> adj = {{{10, 1}},                                  // 0 -> E1
-                                {{10, 0}, {8.5, 2}, {10, 8}, {3.5, 9}},     // 1 -> E2
-                                {{8.5, 1}, {6.3, 3}, {9.4, 8}, {18.7, 12}}, // 2 -> E3
-                                {{13, 4}, {15.3, 7}, {12.8, 12}, {11, 13}}, // 3 -> E4
-                                {{3, 5}, {2.4, 6}, {30, 7}},                // 4 -> E5
-                                {{3, 4}},                                   // 5 -> E6
-                                {{2.4, 4}},                                 // 6 -> E7
-                                {{15.3, 3}, {30, 4}, {9.6, 8}, {6.4, 11}},  // 7 -> E8
-                                {{10, 1}, {9.4, 2}, {9.6, 7}, {12.2, 10}},  // 8 -> E9
-                                {{3.5, 1}},                                 // 9 -> E10
-                                {{12.2, 8}},                                // 10 -> E11
-                                {{6.4, 7}},                                 // 11 -> E12
-                                {{18.7, 2}, {12.8, 3}, {5.1, 13}},          // 12 -> E13
-                                {{5.1, 12}, {11, 3}}};                      // 13 -> E14
+    // Triple {custo, nodeIndex, line color}
+    // vector<vector<Triple>> adj = {{{10, 1, "blue"}},                                                                // 0 -> E1
+    //                             {{10, 0, "blue"}, {8.5, 2, "blue"}, {10, 8, "yellow"}, {3.5, 9, "yellow"}},         // 1 -> E2
+    //                             {{8.5, 1, "blue"}, {6.3, 3, "blue"}, {9.4, 8, "red"}, {18.7, 12, "red"}},           // 2 -> E3
+    //                             {{13, 4, "blue"}, {15.3, 7, "green"}, {12.8, 12, "green"}},                         // 3 -> E4
+    //                             {{3, 5, "blue"}, {2.4, 6, "yellow"}, {30, 7, "yellow"}},                            // 4 -> E5
+    //                             {{3, 4, "blue"}},                                                                   // 5 -> E6
+    //                             {{2.4, 4, "yellow"}},                                                               // 6 -> E7
+    //                             {{15.3, 3, "green"}, {30, 4, "yellow"}, {9.6, 8, "yellow"}, {6.4, 11, "green"}},    // 7 -> E8
+    //                             {{10, 1, "yellow"}, {9.4, 2, "red"}, {9.6, 7, "yellow"}, {12.2, 10, "red"}},        // 8 -> E9
+    //                             {{3.5, 1, "yellow"}},                                                               // 9 -> E10
+    //                             {{12.2, 8, "red"}},                                                                 // 10 -> E11
+    //                             {{6.4, 7, "green"}},                                                                // 11 -> E12
+    //                             {{18.7, 2, "red"}, {12.8, 3, "green"}, {5.1, 13, "green"}},                         // 12 -> E13
+    //                             {{5.1, 12, "green"}}};      // 13 -> E14
+                                
+    map<Pairss, vector<Pairdss>> adj = {{"E1", "blue"}   : { {10, {"E2", "blue"}} },
+                                        {"E2","blue"}    : {  {4, {"E2", "yellow"}}, {10, {"E1", "blue"}}, {8.5, {"E3", "blue"}} },
+                                        {"E2","yellow"}  : { {4, {"E2", "blue"}}, {10, {"E9", "yellow"}}, {3.5, {"E10", "yellow"}} },
+                                        {"E3","blue"}    : { {4, {"E3", "red"}}, {8.5, {"E2", "blue"}},  {6.3, {"E4", "blue"}} },
+                                        {"E3","red"}     : { {4, {"E3", "blue"}}, {8.5, {"E9", "red"}},  {18.7, {"E13", "red"}} },
+                                        {"E4","blue"}    : { {4, {"E4", "green"}}, {6.3, {"E3", "blue"}},  {13, {"E5", "blue"}} },
+                                        {"E4","green"}   : { {4, {"E4", "blue"}}, {15.3,{"E8", "green"}}, {12.8,{"E13", "green"}} },
+                                        {"E5","blue"}    : { {4, {"E5", "yellow"}}, {13,{"E4", "blue"}}, {3,{"E6", "blue"}} },
+                                        {"E5","yellow"}  : { {4, {"E5", "blue"}}, {2.4,{"E7", "yellow"}}, {30,{"E8", "yellow"}} },
+                                        {"E6","blue"}    : { {3,{"E5", "blue"}} },
+                                        {"E7", "yellow"} : { {2.4,{"E5", "yellow"}} },
+                                        {"E8","yellow"}  : { {4, {"E8", "green"}}, {30,{"E5", "yellow"}}, {9.6,{"E9", "yellow"}} },
+                                        {"E8","green"}   : { {4, {"E8", "yellow"}}, {15.3,{"E4", "green"}}, {6.4,{"E12", "green"}} },
+                                        {"E9","yellow"}  : { {4, {"E9", "red"}}, {10,{"E2", "yellow"}}, {9.6,{"E8", "yellow"}} },
+                                        {"E9","red"}     : { {4, {"E9", "yellow"}}, {9.4,{"E3", "red"}}, {12.2,{"E11", "red"}} },
+                                        {"E10","yellow"} : { {3.5,{"E2", "yellow"}} },
+                                        {"E11","red"}    : { {12.2,{"E9", "red"}} },
+                                        {"E12","green"}  : { {6.4,{"E8", "green"}} },
+                                        {"E13","green"}  : { {4, {"E13", "red"}}, {12.8,{"E4", "green"}}, {5.1,{"E14", "green"}} },
+                                        {"E13","red"}    : { {4, {"E13", "green"}}, {18.7,{"E3", "red"}} },
+                                        {"E14","green"}  : { {5.1,{"E13", "green"}} },};                                                     
 
-    /*
-    tá estranho: tem uma aresta que n existe no mapa e E4 se liga diretamente ao E14
-    */
-    int S, T;
+    string station, color, target;
 
     cout << "Estacao de partida: ";
-    cin >> S;
+    cin >> station;
+    cout << "Cor da linha inicial: ";
+    cin >> color;
     cout << "Estacao de chegada: ";
-    cin >> T;
+    cin >> target;
 
-    Astar(adj, S - 1, T - 1);
+    Astar(adj, {station, color} , target);
 
     return 0;
 }
