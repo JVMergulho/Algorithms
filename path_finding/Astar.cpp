@@ -49,8 +49,6 @@ void print_path(Node node)
         else
             cout << state.first << " " << state.second << "\n";
 
-        cout << "color = " << color << " | nextColor = " << nextColor << " | transfer = " << transfer << "\n";
-
         color = nextColor;
     }
     cout << "Distancia total = " << node.cost - 2 * transfer << " Km \n";
