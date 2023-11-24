@@ -33,7 +33,7 @@ void print_path(Node node)
     }
 
     color = path.top().second;
-
+    std::cout << "------------------------ \n";
     cout << "\nShortest path: ";
     while (!path.empty())
     {
@@ -84,7 +84,7 @@ double calculateH(string sta1, string sta2)
 void Astar(map<Pairss, vector<pair<double, Pairss>>> adj, Pairss start, string target)
 {
 
-    priority_queue<Pairdss, vector<Pairdss>, greater<Pairdss>> frontier;
+    multiset<Pairdss> frontier;
     bool found;
     Node finalNode;
 
@@ -96,17 +96,17 @@ void Astar(map<Pairss, vector<pair<double, Pairss>>> adj, Pairss start, string t
     Pairss currState, state;
     double currCost, nodeCost, newCost, newValue;
 
-    frontier.push({0, start});
+    frontier.insert({0, start});
 
     while (!frontier.empty()) // pair {f , state}
     {
-        currState = frontier.top().second; // pair { station, color}
+        currState = (frontier.begin())->second; // pair { station, color}
         currCost = nodes[currState].cost;
-        frontier.pop();
+        frontier.erase(frontier.begin());
 
         if (!nodes[currState].visited)
         {
-            std::cout << "CurrState = " << currState.first << " " << currState.second << "\n";
+            std::cout << "\nCurrState = " << currState.first << " " << currState.second << "\n";
             if (currState.first == target)
             {
                 found = true;
@@ -132,10 +132,17 @@ void Astar(map<Pairss, vector<pair<double, Pairss>>> adj, Pairss start, string t
                 {
                     nodes[state].cost = newCost;
                     nodes[state].value = newValue;
-                    frontier.push({newValue, state});
+                    frontier.insert({newValue, state});
                     nodes[state].parent = &nodes[currState];
                 }
             }
+
+            cout << "Fronteira: ";
+            for (auto p : frontier)
+            {
+                cout << "( " << p.first << ", { " << p.second.first << " " << p.second.second << " } ) ";
+            }
+            cout << "\n ";
         }
     }
 
