@@ -75,8 +75,8 @@ vector<vector<double>> H = {
 
 double calculateH(string sta1, string sta2)
 {
-    int i = stoi(string(1, sta1[1])) - 1;
-    int j = stoi(string(1, sta2[1])) - 1;
+    int i = stoi(string(sta1.substr(1))) - 1;
+    int j = stoi(string(sta2.substr(1))) - 1;
 
     return H[i][j];
 }
