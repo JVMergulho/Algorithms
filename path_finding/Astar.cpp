@@ -1,7 +1,6 @@
 #include <bits/stdc++.h> // Inclui STL
 using namespace std;
 
-typedef tuple<double, int, string> Triple;
 typedef pair<string, string> Pairss;
 typedef pair<double, Pairss> Pairdss;
 
@@ -87,6 +86,7 @@ void Astar(map<Pairss, vector<pair<double, Pairss>>> adj, Pairss start, string t
     multiset<Pairdss> frontier;
     bool found;
     Node finalNode;
+    int i = 1;
 
     map<Pairss, Node> nodes;
     nodes[start] = Node(start);
@@ -137,12 +137,14 @@ void Astar(map<Pairss, vector<pair<double, Pairss>>> adj, Pairss start, string t
                 }
             }
 
-            cout << "Fronteira: ";
+            cout << "Fronteira " << i << ": ";
             for (auto p : frontier)
             {
                 cout << "( " << p.first << ", { " << p.second.first << " " << p.second.second << " } ) ";
             }
             cout << "\n ";
+
+            i++;
         }
     }
 
